@@ -12,6 +12,10 @@ const TweetCard = () => {
   const [showMenu, setShowMenu] = useState(false); // State to toggle the menu
   const [liked, setLiked] = useState(false); // State to toggle like/unlike
 
+  const loggedInUserId = 5; // Hardcoded logged-in user ID - replace with actual auth
+  const tweetUserId = 5; // Hardcoded tweet user ID - replace with actual data
+  const isLoggedInUser = loggedInUserId === tweetUserId; // Check if the logged-in user is the tweet owner
+  
   const handleDelete = () => {
     console.log("Tweet deleted");
     setShowMenu(false); // Close the menu after deletion
@@ -62,7 +66,7 @@ const TweetCard = () => {
                 className="cursor-pointer text-gray-500 hover:text-gray-700"
                 onClick={() => setShowMenu(!showMenu)}
               />
-              {showMenu && (
+              {isLoggedInUser && showMenu && (
                 <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                   <button
                     className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-100"

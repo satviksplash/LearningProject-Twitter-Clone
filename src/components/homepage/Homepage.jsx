@@ -31,6 +31,8 @@ import React from 'react'
 import Navigation from '../Navigation/Navigation'
 import HomeSection from '../HomeSection/HomeSection'
 import RightPart from '../RightPart/RightPart'
+import { Route, Routes } from 'react-router-dom'
+import Profile from '../Profile/Profile'
 
 const Homepage = () => {
   return (
@@ -42,7 +44,10 @@ const Homepage = () => {
       </div>
 
       <div className="col-span-1 lg:col-span-6 overflow-y-auto">
-        <HomeSection />
+        <Routes>
+          <Route path="/" element={<HomeSection />} />
+          <Route path="/profile/:id" element={<Profile />} />
+        </Routes>
       </div>
 
       <div className="hidden lg:block lg:col-span-3 overflow-y-auto">

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from 'react-router-dom';
 
 const RightPart = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
   
   // Placeholder users data - replace with actual data/API call
   const users = [
@@ -34,6 +36,7 @@ const RightPart = () => {
           <div className="mt-4 bg-white rounded-lg shadow-lg">
             {filteredUsers.map(user => (
               <div 
+              onClick={()=> navigate(`/profile/${5}`)}
                 key={user.id}
                 className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer"
               >
