@@ -52,7 +52,7 @@ const TweetCard = () => {
         />
 
         {/* Tweet Details */}
-        <div className="w-full">
+        <div className="w-full ">
           {/* Header (Name, Username, Timestamp) */}
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
@@ -86,12 +86,12 @@ const TweetCard = () => {
           </div>
 
           {/* Tweet Content */}
+          <div onClick={() => navigate(`/tweet/${5}`)} className="cursor-pointer">
           <p className="mt-2 text-gray-800">
             This is a hardcoded tweet for demonstration purposes. 🚀
           </p>
 
-          {/* Tweet Image */}
-          {
+          {/* Tweet Image */}          
             <div className="mt-3">
               <img
                 src="https://res.cloudinary.com/demo/image/upload/kitten.jpg"
@@ -99,7 +99,8 @@ const TweetCard = () => {
                 className="w-full h-auto rounded-lg"
               />
             </div>
-          }
+          </div>
+          
 
           <div className="flex justify-between items-center mt-4 text-gray-500">
             {/* Comments */}

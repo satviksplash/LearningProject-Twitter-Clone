@@ -5,11 +5,13 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import TweetCard from "../HomeSection/TweetCard";
+import ProfileModal from "./ProfileModal";
 
 const Profile = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("tweets");
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // Placeholder user data - replace with API call later
 
   // Hardcoded user data - replace with API call later
@@ -25,37 +27,16 @@ const Profile = () => {
     followers: 567,
     coverImage:
       "https://t4.ftcdn.net/jpg/02/66/72/41/360_F_266724172_Iy8gdKgMa7XmrhYYxLCxyhx6J7070Pr8.jpg",
-    avatar:
+    profileImage:
       "https://t4.ftcdn.net/jpg/02/66/72/41/360_F_266724172_Iy8gdKgMa7XmrhYYxLCxyhx6J7070Pr8.jpg",
   };
   // Hardcoded logged-in user ID - replace with actual auth
-  const loggedInUserId = 2;
+  const loggedInUserId = 5;
 
   const handleFollowToggle = () => {
     setIsFollowing(!isFollowing);
     // Add API call here to update follow status
   };
-
-  //     const renderContent = () => {
-  //     switch (activeTab) {
-  //       case 'tweets':
-  //         return (
-  //           <div className="divide-y divide-gray-200">
-  //             {[1, 2, 3].map((_, index) => (
-  //               <TweetCard key={index} />
-  //             ))}
-  //           </div>
-  //         );
-  //       case 'replies':
-  //         return <div>Replies content</div>;
-  //       case 'media':
-  //         return <div>Media content</div>;
-  //       case 'likes':
-  //         return <div>Likes content</div>;
-  //       default:
-  //         return null;
-  //     }
-  //   };
 
   return (
     <div className="min-h-screen">
@@ -87,15 +68,17 @@ const Profile = () => {
         {/* Avatar and Edit Button */}
         <div className="relative -mt-16 mb-3 flex justify-between items-start">
           <Avatar
-            src={user.avatar}
+            src={user.profileImage}
             alt={user.name}
             sx={{ width: 120, height: 120, border: "4px solid white" }}
           />
           {user.id === loggedInUserId ? (
             // Show Edit Profile button for logged-in user
-            <button className="px-4 py-1.5 border border-gray-300 rounded-full font-semibold hover:bg-gray-100">
+            <button onClick={() => setIsModalOpen(true)} className="px-4 py-1.5 border border-gray-300 rounded-full font-semibold hover:bg-gray-100">
               Edit Profile
             </button>
+
+            
           ) : (
             // Show Follow/Unfollow button for other profiles
             <button
@@ -180,6 +163,12 @@ const Profile = () => {
 
       {/* Likes Section */}
       {activeTab === "likes" && <div>Likes</div>}
+
+      <ProfileModal
+            open={isModalOpen}
+            handleClose={() => setIsModalOpen(false)}
+            userData={user} // Pass the user data here
+          />
     </div>
   );
 };

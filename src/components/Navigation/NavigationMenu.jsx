@@ -7,7 +7,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ExploreIcon from '@mui/icons-material/Explore';
 
 export const navigation = [
-    { title: "Home", icon: <HomeIcon />, path: "/" },
+    { title: "Home", icon: <HomeIcon />, path: "/home" },
     { title: "Explore", icon: <ExploreIcon />, path: "/explore" },
     { title: "Notifications", icon: <NotificationsIcon />, path: "/notifications" },
     { title: "Messages", icon: <MessageIcon />, path: "/messages" },
