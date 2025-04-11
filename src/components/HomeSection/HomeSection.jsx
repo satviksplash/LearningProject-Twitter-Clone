@@ -64,11 +64,18 @@ const HomeSection = () => {
         )}
         {tweetImage && (
           <div className="mt-2">
+            <button
+              onClick={() => setTweetImage(null)}
+              className=" bg-gray-900 bg-opacity-50 text-white rounded p-1 mb-1  hover:bg-opacity-70"
+            >
+              ✕
+            </button>
             <img
               src={tweetImage}
               alt="Preview"
               className="w-full h-auto rounded-lg"
             />
+            
           </div>
         )}
         <div className="flex justify-between items-center mt-2">
@@ -96,8 +103,9 @@ const HomeSection = () => {
 
       {/* Tweets Feed */}
       <div className="flex flex-col mx-5 my-5">
-
-        {[1,1,1,1,1,1,1,1,1].map(()  => <TweetCard />)}
+        {[1, 1, 1, 1, 1, 1, 1, 1, 1].map(() => (
+          <TweetCard />
+        ))}
 
         <div className="p-4 text-gray-500 text-center">
           No tweets yet. Start tweeting!

@@ -6,16 +6,19 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CommentIcon from "@mui/icons-material/Comment";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import ReplyModal from "./ReplyModal";
 
 const TweetCard = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false); // State to toggle the menu
   const [liked, setLiked] = useState(false); // State to toggle like/unlike
 
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+
   const loggedInUserId = 5; // Hardcoded logged-in user ID - replace with actual auth
   const tweetUserId = 5; // Hardcoded tweet user ID - replace with actual data
   const isLoggedInUser = loggedInUserId === tweetUserId; // Check if the logged-in user is the tweet owner
-  
+
   const handleDelete = () => {
     console.log("Tweet deleted");
     setShowMenu(false); // Close the menu after deletion
@@ -30,8 +33,6 @@ const TweetCard = () => {
   const handleLikeToggle = () => {
     setLiked(!liked); // Toggle like/unlike state
   };
-
-
 
   return (
     <div className="p-4 border-b border-gray-300 hover:bg-gray-100">
@@ -86,12 +87,15 @@ const TweetCard = () => {
           </div>
 
           {/* Tweet Content */}
-          <div onClick={() => navigate(`/tweet/${5}`)} className="cursor-pointer">
-          <p className="mt-2 text-gray-800">
-            This is a hardcoded tweet for demonstration purposes. 🚀
-          </p>
+          <div
+            onClick={() => navigate(`/tweet/${5}`)}
+            className="cursor-pointer"
+          >
+            <p className="mt-2 text-gray-800">
+              This is a hardcoded tweet for demonstration purposes. 🚀
+            </p>
 
-          {/* Tweet Image */}          
+            {/* Tweet Image */}
             <div className="mt-3">
               <img
                 src="https://res.cloudinary.com/demo/image/upload/kitten.jpg"
@@ -100,12 +104,13 @@ const TweetCard = () => {
               />
             </div>
           </div>
-          
 
           <div className="flex justify-between items-center mt-4 text-gray-500">
             {/* Comments */}
             <div className="flex items-center space-x-1 cursor-pointer hover:text-blue-500">
-              <CommentIcon fontSize="small" />
+              <div onClick={() => setIsReplyModalOpen(true)}>
+                <CommentIcon fontSize="small" />
+              </div>
               <span className="text-sm">12</span>
             </div>
 
@@ -123,13 +128,18 @@ const TweetCard = () => {
               {liked ? (
                 <FavoriteIcon fontSize="small" className="text-red-500" />
               ) : (
-                <FavoriteBorderIcon fontSize="small"/>
+                <FavoriteBorderIcon fontSize="small" />
               )}
               <span className="text-sm">{liked ? "1" : "0"}</span>
             </div>
           </div>
         </div>
       </div>
+
+      <ReplyModal 
+  open={isReplyModalOpen}
+  handleClose={() => setIsReplyModalOpen(false)}
+/>
     </div>
   );
 };
