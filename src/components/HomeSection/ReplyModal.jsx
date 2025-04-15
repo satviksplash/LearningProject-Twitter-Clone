@@ -4,6 +4,9 @@ import Modal from "@mui/material/Modal";
 import { Avatar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ImageIcon from "@mui/icons-material/Image";
+import { useDispatch } from "react-redux";
+import { createTweetReply } from "../../Store/Tweet/Action";
+import uploadToCloudnary from "../../Utils/uploadToCloudnary";
 
 const style = {
   position: "absolute",
@@ -19,15 +22,15 @@ const style = {
   borderRadius: 4,
 };
 
-const ReplyModal = ({ open, handleClose }) => {
+const ReplyModal = ({ open, handleClose, item }) => {
   const [replyText, setReplyText] = useState("");
   const [replyImage, setReplyImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
-
   // Hardcoded user data - replace with actual auth user data
-  const currentUser = {
-    avatar: "https://res.cloudinary.com/demo/image/upload/kitten.jpg",
-  };
+  const currentUser = item?.user;
+
+  const dispatch = useDispatch();
 
   const handleReplyChange = (e) => {
     const text = e.target.value;
@@ -40,22 +43,25 @@ const ReplyModal = ({ open, handleClose }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setReplyImage(URL.createObjectURL(file));
+      setReplyImage(file); // Store the actual file
+      setImagePreview(URL.createObjectURL(file)); // Store URL for preview
     }
   };
 
-  const handleSubmitReply = () => {
+  const handleSubmitReply = async () => {
     if (replyText.trim() || replyImage) {
+      const url = await uploadToCloudnary(replyImage); // Pass the actual file
       const newReply = {
         content: replyText,
-        image: replyImage,
-        timestamp: Date.now(),
+        image: url,
+        createdAt: new Date().toISOString(), // Use ISO string for consistency
+        tweetId: item?.id,
       };
-      console.log("New Reply:", newReply);
-      // Add API call here to post reply
+      dispatch(createTweetReply(newReply));
       handleClose();
       setReplyText("");
       setReplyImage(null);
+      setImagePreview(null); // Clear preview
       setIsTyping(false);
     }
   };
@@ -80,14 +86,17 @@ const ReplyModal = ({ open, handleClose }) => {
             />
             <div>
               <div className="flex items-center space-x-1">
-                <span className="font-bold">John Doe</span>
-                <span className="text-gray-500">@johndoe</span>
+                <span className="font-bold">{item?.user?.fullName}</span>
+                <span className="text-gray-500">
+                  @{item?.user?.fullName.split(" ").join("_")}
+                </span>
               </div>
-              <p className="text-gray-600 mt-1">
-                This is the original tweet content...
-              </p>
+              <p className="text-gray-600 mt-1">{item?.content}</p>
               <p className="text-gray-500 text-sm mt-2">
-                Replying to <span className="text-blue-500">@johndoe</span>
+                Replying to{" "}
+                <span className="text-blue-500">
+                  @{item?.user?.fullName.split(" ").join("_")}
+                </span>
               </p>
             </div>
           </div>
@@ -96,7 +105,7 @@ const ReplyModal = ({ open, handleClose }) => {
         {/* Reply Input Section */}
         <div className="p-4">
           <div className="flex space-x-3">
-            <Avatar src={currentUser.avatar} alt="Current User" />
+            <Avatar src={currentUser?.avatar} alt="Current User" />
             <div className="flex-1">
               <textarea
                 className="w-full p-2 border-none focus:outline-none focus:ring-0 resize-none"
@@ -105,15 +114,18 @@ const ReplyModal = ({ open, handleClose }) => {
                 value={replyText}
                 onChange={handleReplyChange}
               />
-              {replyImage && (
+              {imagePreview && (
                 <div className="mt-2 relative">
                   <img
-                    src={replyImage}
+                    src={imagePreview}
                     alt="Reply"
                     className="w-full h-auto rounded-lg"
                   />
                   <button
-                    onClick={() => setReplyImage(null)}
+                    onClick={() => {
+                      setReplyImage(null);
+                      setImagePreview(null);
+                    }}
                     className="absolute top-2 right-2 bg-gray-900 bg-opacity-50 text-white rounded-full p-1"
                   >
                     ✕

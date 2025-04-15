@@ -7,19 +7,43 @@ import CommentIcon from "@mui/icons-material/Comment";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ReplyModal from "./ReplyModal";
+import { useDispatch, useSelector } from "react-redux";
+import { createReTweet, deleteTweet, likeTweet } from "../../Store/Tweet/Action";
 
-const TweetCard = () => {
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = (now - date) / 1000; // difference in seconds
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
+  
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+  });
+};
+
+const TweetCard = ({item}) => {
+
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false); // State to toggle the menu
-  const [liked, setLiked] = useState(false); // State to toggle like/unlike
 
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
 
-  const loggedInUserId = 5; // Hardcoded logged-in user ID - replace with actual auth
-  const tweetUserId = 5; // Hardcoded tweet user ID - replace with actual data
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
+
+  // console.log(" auth : ",auth);
+
+  const loggedInUserId = auth?.user?.id; // Hardcoded logged-in user ID - replace with actual auth
+  const tweetUserId = item?.user?.id; // Hardcoded tweet user ID - replace with actual data
   const isLoggedInUser = loggedInUserId === tweetUserId; // Check if the logged-in user is the tweet owner
 
   const handleDelete = () => {
+    dispatch(deleteTweet(item.id));
     console.log("Tweet deleted");
     setShowMenu(false); // Close the menu after deletion
     // Add your delete logic here
@@ -30,23 +54,32 @@ const TweetCard = () => {
     // Add your edit logic here
   };
 
+  const handleRetweet = () => {
+    dispatch(createReTweet(item.id));
+    console.log("Tweet retweeted");
+  }
+
   const handleLikeToggle = () => {
-    setLiked(!liked); // Toggle like/unlike state
+    // setLiked(!liked); // Toggle like/unlike state
+    // Add your like/unlike logic here
+    dispatch(likeTweet(item.id));
+    console.log("Tweet liked/unliked");
+
   };
 
   return (
     <div className="p-4 border-b border-gray-300 hover:bg-gray-100">
       {/* Retweet Info */}
-      <div className="flex items-center text-sm text-gray-500 mb-2">
+      {item?.retweet && <div className="flex items-center text-sm text-gray-500 mb-2">
         <RepeatIcon fontSize="small" />
-        <p className="ml-1">John Doe retweeted</p>
-      </div>
+        <p className="ml-1">{item?.user?.fullName} retweeted</p>
+      </div>}
 
       {/* Main Tweet Content */}
       <div className="flex space-x-3">
         {/* Avatar */}
         <Avatar
-          onClick={() => navigate(`/profile/${5}`)}
+          onClick={() => navigate(`/profile/${item?.user?.id}`)}
           className="cursor-pointer"
           alt="John Doe"
           src="https://res.cloudinary.com/demo/image/upload/kitten.jpg"
@@ -57,8 +90,8 @@ const TweetCard = () => {
           {/* Header (Name, Username, Timestamp) */}
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <span className="font-semibold">John Doe</span>
-              <span className="text-gray-600">@johndoe · 2m</span>
+              <span className="font-semibold">{item?.user?.fullName}</span>
+              <span className="text-gray-600">@{item?.user?.fullName.split(" ").join("_").toLowerCase()} · {formatDate(item?.createdAt)}</span>
             </div>
 
             {/* More Options Icon */}
@@ -88,21 +121,21 @@ const TweetCard = () => {
 
           {/* Tweet Content */}
           <div
-            onClick={() => navigate(`/tweet/${5}`)}
+            onClick={() => navigate(`/tweet/${item.id}`)}
             className="cursor-pointer"
           >
             <p className="mt-2 text-gray-800">
-              This is a hardcoded tweet for demonstration purposes. 🚀
+              {item?.content}
             </p>
 
             {/* Tweet Image */}
-            <div className="mt-3">
+            {item?.image &&  <div className="mt-3">
               <img
-                src="https://res.cloudinary.com/demo/image/upload/kitten.jpg"
+                src={item.image}
                 alt="Tweet"
                 className="w-full h-auto rounded-lg"
               />
-            </div>
+            </div>}
           </div>
 
           <div className="flex justify-between items-center mt-4 text-gray-500">
@@ -111,13 +144,13 @@ const TweetCard = () => {
               <div onClick={() => setIsReplyModalOpen(true)}>
                 <CommentIcon fontSize="small" />
               </div>
-              <span className="text-sm">12</span>
+              <span className="text-sm">{item?.totalReplies}</span>
             </div>
 
             {/* Retweet/Repost */}
             <div className="flex items-center space-x-1 cursor-pointer hover:text-green-500">
-              <RepeatIcon fontSize="small" />
-              <span className="text-sm">5</span>
+              <RepeatIcon  onClick={handleRetweet} fontSize="small" />
+              <span className="text-sm">{item?.totalRetweets}</span>
             </div>
 
             {/* Like/Unlike */}
@@ -125,12 +158,12 @@ const TweetCard = () => {
               className="flex items-center space-x-1 cursor-pointer hover:text-red-500"
               onClick={handleLikeToggle}
             >
-              {liked ? (
+              {item?.liked ? (
                 <FavoriteIcon fontSize="small" className="text-red-500" />
               ) : (
                 <FavoriteBorderIcon fontSize="small" />
               )}
-              <span className="text-sm">{liked ? "1" : "0"}</span>
+              <span className="text-sm">{item?.totalLikes}</span>
             </div>
           </div>
         </div>
@@ -139,6 +172,7 @@ const TweetCard = () => {
       <ReplyModal 
   open={isReplyModalOpen}
   handleClose={() => setIsReplyModalOpen(false)}
+  item={item}
 />
     </div>
   );

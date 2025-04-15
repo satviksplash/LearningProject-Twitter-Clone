@@ -1,37 +1,28 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { use, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TweetCard from '../HomeSection/TweetCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { findTweetById } from '../../Store/Tweet/Action';
 
 const TweetDetails = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Hardcoded data for now - replace with API call using useEffect
-  const mainTweet = {
-    id: 1,
-    content: "This is the main tweet 🚀",
-    userId: 5,
-    timestamp: "2h",
-    likes: 45,
-    retweets: 5,
-    comments: 12,
-  };
+  const id = useParams().id;
+  useEffect(()=>{
 
-  // Hardcoded replies - replace with API call
-  const replies = [
-    {
-      id: 2,
-      content: "This is a reply 👋",
-      userId: 6,
-      timestamp: "1h",
-    },
-    {
-      id: 3,
-      content: "Another reply 🎉",
-      userId: 7,
-      timestamp: "30m",
-    }
-  ];
+  if(id){
+    dispatch(findTweetById(id))
+  }
+
+  }, []);
+
+
+
+  // // Hardcoded replies - replace with API call
+  const {tweet} = useSelector((state) => state);
+  const replies = tweet.tweet?.replyTweets;
 
   return (
     <div className="min-h-screen">
@@ -48,7 +39,7 @@ const TweetDetails = () => {
 
       {/* Main Tweet */}
       <div className="border-b border-gray-200">
-        <TweetCard />
+      <TweetCard item={tweet.tweet} />
       </div>
 
       {/* Replies Section */}
@@ -57,11 +48,11 @@ const TweetDetails = () => {
           Replies
         </div>
         <div className="divide-y divide-gray-200">
-          {replies.map((_, index) => (
-            <TweetCard key={index} />
+          {replies && replies.map((_, index) => (
+            <TweetCard item={_} key={index} />
           ))}
         </div>
-        {replies.length === 0 && (
+        {replies?.length === 0 && (
           <div className="p-4 text-center text-gray-500">
             No replies yet. Be the first to reply!
           </div>

@@ -1,14 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ImageIcon from "@mui/icons-material/Image";
 import TweetCard from "./TweetCard";
+import { useDispatch, useSelector } from "react-redux";
+import { createTweet, getAllTweets } from "../../Store/Tweet/Action";
+import uploadToCloudnary from "../../Utils/uploadToCloudnary";
 
 const HomeSection = () => {
-  const [tweets, setTweets] = useState([]);
-
+  const dispatch = useDispatch();
+  const {tweet} =  useSelector((state) => state);
+  // console.log(tweet);
+  // const [tweets, setTweets] = useState([]);
   const [tweetText, setTweetText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   const [tweetImage, setTweetImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleTweetChange = (e) => {
     const text = e.target.value;
@@ -21,23 +27,30 @@ const HomeSection = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setTweetImage(URL.createObjectURL(file)); // Create a preview URL for the image
+      setTweetImage(file); // Store the actual file
+      setImagePreview(URL.createObjectURL(file)); // Store URL for preview only
     }
   };
 
-  const handleTweetSubmit = () => {
+  useEffect(()=>{
+    // console.log("in useEffect")
+    dispatch(getAllTweets());
+  }, [dispatch,  tweet.like])
+
+
+  const handleTweetSubmit =  async () => {
     if (tweetText.trim() || tweetImage) {
+      const url = await uploadToCloudnary(tweetImage); // Now passing the actual file
       const newTweet = {
         content: tweetText,
-        image: tweetImage,
-        timeStamp: Date.now(),
+        image: url,
+        createdAt: new Date().toISOString(),
       };
-      console.log(newTweet);
-      // Here you would typically send the new tweet to your backend API
-      // setTweets([newTweet, ...tweets]); // Add the new tweet to the list
-      setTweetText(""); // Clear the text input
-      setTweetImage(null); // Clear the image input
-      setIsTyping(false); // Reset typing state
+      dispatch(createTweet(newTweet));
+      setTweetText("");
+      setTweetImage(null);
+      setImagePreview(null); // Clear preview
+      setIsTyping(false);
     }
   };
 
@@ -62,22 +75,24 @@ const HomeSection = () => {
             {tweetText.length}/250
           </div>
         )}
-        {tweetImage && (
-          <div className="mt-2">
-            <button
-              onClick={() => setTweetImage(null)}
-              className=" bg-gray-900 bg-opacity-50 text-white rounded p-1 mb-1  hover:bg-opacity-70"
-            >
-              ✕
-            </button>
-            <img
-              src={tweetImage}
-              alt="Preview"
-              className="w-full h-auto rounded-lg"
-            />
-            
-          </div>
-        )}
+        {imagePreview && ( // Change tweetImage to imagePreview for display
+      <div className="mt-2">
+        <button
+          onClick={() => {
+            setTweetImage(null);
+            setImagePreview(null);
+          }}
+          className="bg-gray-900 bg-opacity-50 text-white rounded p-1 mb-1 hover:bg-opacity-70"
+        >
+          ✕
+        </button>
+        <img
+          src={imagePreview}
+          alt="Preview"
+          className="w-full h-auto rounded-lg"
+        />
+      </div>
+    )}
         <div className="flex justify-between items-center mt-2">
           {/* Image Upload Icon */}
           <label className="cursor-pointer">
@@ -103,8 +118,8 @@ const HomeSection = () => {
 
       {/* Tweets Feed */}
       <div className="flex flex-col mx-5 my-5">
-        {[1, 1, 1, 1, 1, 1, 1, 1, 1].map(() => (
-          <TweetCard />
+        {tweet.tweets.map((item, index) => (
+          <TweetCard item={item}  key={index}/>
         ))}
 
         <div className="p-4 text-gray-500 text-center">

@@ -6,6 +6,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import TweetCard from "../HomeSection/TweetCard";
 import ProfileModal from "./ProfileModal";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -14,24 +15,11 @@ const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // Placeholder user data - replace with API call later
 
-  // Hardcoded user data - replace with API call later
+  const auth = useSelector((state) => state.auth);
 
-  const user = {
-    id: 5,
-    name: "John Doe",
-    username: "johndoe",
-    bio: "🚀 Full Stack Developer | Building awesome things",
-    location: "San Francisco, CA",
-    joinedDate: "Joined March 2024",
-    following: 234,
-    followers: 567,
-    coverImage:
-      "https://t4.ftcdn.net/jpg/02/66/72/41/360_F_266724172_Iy8gdKgMa7XmrhYYxLCxyhx6J7070Pr8.jpg",
-    profileImage:
-      "https://t4.ftcdn.net/jpg/02/66/72/41/360_F_266724172_Iy8gdKgMa7XmrhYYxLCxyhx6J7070Pr8.jpg",
-  };
+  const user = auth.user;
   // Hardcoded logged-in user ID - replace with actual auth
-  const loggedInUserId = 5;
+  const profileUserId = useParams().id;
 
   const handleFollowToggle = () => {
     setIsFollowing(!isFollowing);
