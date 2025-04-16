@@ -14,36 +14,56 @@ const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("tweets");
-  const [isFollowing, setIsFollowing] = useState(false);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const auth = useSelector((state) => state.auth);
   const tweet = useSelector((state) => state.tweet);
   const { id } = useParams();
+
+  // console.log("tweet",tweet);
   
   // Get the current logged-in user
-  console.log("auth",auth);
+  // console.log("auth",auth);
   const currentUser = auth.user;
-  console.log("currentUser",currentUser);
+  // console.log("currentUser",currentUser);
 
   const profileUser = auth.findUser;
-  console.log("profileUser",profileUser);
+  // console.log("profileUser",profileUser);
   // Check if the profile is of the current user
   const isOwnProfile = currentUser?.id === profileUser?.id;
   const user = profileUser;
 
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  // Update isFollowing state when profile user data changes
+  useEffect(() => {
+    if (user?.followed !== undefined) {
+      setIsFollowing(user.followed);
+    }
+  }, [user]);
+
   useEffect(() => {
     // If the profile ID is different from the current user's ID, fetch the profile user
-      if(id){
-        dispatch(findUserById(id));
-      dispatch(getUserTweets(user?.id));
-      }
-    
+    if(id) {
+      dispatch(findUserById(id));
+      dispatch(getUserTweets(id));
+    }
+  }, [id, dispatch]);
+
+  // useEffect(() => {
+  //   // Fetch user's tweets when the component mounts or when the user changes
+  //   if (user?.id) {
+      
+  //   }
+  // }, [user?.id, dispatch]);
+
+  useEffect(() => {
     // Fetch user's liked tweets when the "likes" tab is active
     if (activeTab === "likes" && user?.id) {
       dispatch(getUserLikedTweets(user.id));
     }
-  }, [id, user?.id, activeTab, dispatch,isFollowing]);
+  }, [activeTab, user?.id, dispatch]);
 
   const handleFollowToggle = () => {
     dispatch(followUserAction(user.id));

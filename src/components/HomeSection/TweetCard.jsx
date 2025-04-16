@@ -9,21 +9,32 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ReplyModal from "./ReplyModal";
 import { useDispatch, useSelector } from "react-redux";
 import { createReTweet, deleteTweet, likeTweet } from "../../Store/Tweet/Action";
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = (now - date) / 1000; // difference in seconds
-  if (diff < 60) return 'just now';
-  if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
-  
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-  });
+dayjs.extend(relativeTime);
+dayjs.extend(localizedFormat);
+const formatDate = (dateString) => {  
+  if (!dateString) return "";
+
+  const tweetDate = dayjs(dateString);
+  const now = dayjs();
+  const diffInMinutes = now.diff(tweetDate, 'minute');
+  const diffInHours = now.diff(tweetDate, 'hour');
+  const diffInDays = now.diff(tweetDate, 'day');
+
+  if (diffInMinutes < 1) {
+    return "just now";
+  } else if (diffInMinutes < 60) {
+    return `${diffInMinutes}m`;
+  } else if (diffInHours < 24) {
+    return `${diffInHours - 5}h`;
+  } else if (diffInDays < 7) {
+    return `${diffInDays}d`;
+  } else {
+    return tweetDate.format("MMM D"); // e.g., "Apr 16"
+  }
 };
 
 const TweetCard = ({item}) => {

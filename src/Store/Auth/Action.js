@@ -14,6 +14,8 @@ import {
   LOGOUT,
   REGISTER_USER_FAILURE,
   REGISTER_USER_SUCCESS,
+  SEARCH_USER_FAILURE,
+  SEARCH_USER_SUCCESS,
   UPDATE_USER_FAILURE,
   UPDATE_USER_SUCCESS,
 } from "./ActionType";
@@ -112,6 +114,21 @@ export const followUserAction = (userId) => async (dispatch) => {
   } catch (error) {
     console.error("Error following user: ", error);
     dispatch({ type: FOLLOW_USER_FAILURE, payload: error.message });
+  }
+};
+
+
+export const searchUser = (query) => async (dispatch) => {
+  try {
+    const response = await getApi().get(`/api/user/search?query=${query}`);
+    const users = response.data;
+    console.log("search result -: ", users);
+   
+    dispatch({type:SEARCH_USER_SUCCESS,payload:users});
+  } catch (error) {
+    dispatch(
+      {type:SEARCH_USER_FAILURE,error:error.message}
+    );
   }
 };
 

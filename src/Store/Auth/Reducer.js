@@ -1,6 +1,6 @@
-import { 
-    LOGIN_USER_REQUEST, 
-    LOGIN_USER_SUCCESS, 
+import {
+    LOGIN_USER_REQUEST,
+    LOGIN_USER_SUCCESS,
     LOGIN_USER_FAILURE,
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
@@ -12,7 +12,9 @@ import {
     FIND_USER_BY_ID_SUCCESS,
     FOLLOW_USER_SUCCESS,
     UPDATE_USER_SUCCESS,
-
+    SEARCH_USER_SUCCESS,
+    SEARCH_USER_FAILURE,
+    SEARCH_USER_REQUEST,
 } from "./ActionType"
 
 const initialState = {
@@ -27,6 +29,7 @@ export const authReducer = (state = initialState, action) => {
         case LOGIN_USER_REQUEST:
         case REGISTER_USER_REQUEST:
         case GET_USER_PROILE_REQUEST:
+        case SEARCH_USER_REQUEST:
             return {
                 ...state,
                 loading: true,
@@ -50,14 +53,14 @@ export const authReducer = (state = initialState, action) => {
                 error: null,
                 user: action.payload
             }
-            case UPDATE_USER_SUCCESS:
-                return {
-                    ...state,
-                    loading: false,
-                    error: null,
-                    user: action.payload,
-                    updateUser :  true
-                }
+        case UPDATE_USER_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                error: null,
+                user: action.payload,
+                updateUser: true
+            }
 
         case FIND_USER_BY_ID_SUCCESS:
             return {
@@ -73,10 +76,14 @@ export const authReducer = (state = initialState, action) => {
                 error: null,
                 findUser: action.payload
             }
+
+        case SEARCH_USER_SUCCESS:
+            return { ...state, loading: false, searchResult: action.payload, error: null };
         case LOGOUT:
             return initialState;
 
         case LOGIN_USER_FAILURE:
+        case SEARCH_USER_FAILURE:
         case REGISTER_USER_FAILURE:
         case GET_USER_PROILE_FAILURE:
             return {

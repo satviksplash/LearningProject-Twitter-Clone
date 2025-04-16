@@ -4,7 +4,7 @@ import Modal from "@mui/material/Modal";
 import { Avatar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ImageIcon from "@mui/icons-material/Image";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createTweetReply } from "../../Store/Tweet/Action";
 import uploadToCloudnary from "../../Utils/uploadToCloudnary";
 
@@ -27,8 +27,8 @@ const ReplyModal = ({ open, handleClose, item }) => {
   const [replyImage, setReplyImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
-  // Hardcoded user data - replace with actual auth user data
-  const currentUser = item?.user;
+  const auth = useSelector((state) => state.auth);
+  const currentUser = auth.user;
 
   const dispatch = useDispatch();
 
@@ -81,7 +81,7 @@ const ReplyModal = ({ open, handleClose, item }) => {
         <div className="px-4 py-2 border-b border-gray-200">
           <div className="flex items-start space-x-3">
             <Avatar
-              src="https://res.cloudinary.com/demo/image/upload/kitten.jpg"
+              src={item?.user?.profileImage  || "https://images.vexels.com/media/users/3/129733/isolated/preview/a558682b158debb6d6f49d07d854f99f-casual-male-avatar-silhouette.png"}
               alt="Original Tweet Author"
             />
             <div>
@@ -105,7 +105,7 @@ const ReplyModal = ({ open, handleClose, item }) => {
         {/* Reply Input Section */}
         <div className="p-4">
           <div className="flex space-x-3">
-            <Avatar src={currentUser?.avatar} alt="Current User" />
+            <Avatar src={currentUser?.profileImage || "https://images.vexels.com/media/users/3/129733/isolated/preview/a558682b158debb6d6f49d07d854f99f-casual-male-avatar-silhouette.png"} alt="Current User" />
             <div className="flex-1">
               <textarea
                 className="w-full p-2 border-none focus:outline-none focus:ring-0 resize-none"
