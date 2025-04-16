@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import CloseIcon from '@mui/icons-material/Close';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import { useDispatch } from 'react-redux';
+import uploadToCloudnary from '../../Utils/uploadToCloudnary';
+import { updateUserProfile } from '../../Store/Auth/Action';
 
 const style = {
   position: 'absolute',
@@ -30,8 +34,12 @@ const ProfileSchema = Yup.object().shape({
 });
 
 const ProfileModal = ({ open, handleClose, userData }) => {
+  console.log("userData in profile modal",userData);
+  const [coverPreview, setCoverPreview] = useState(userData?.coverImage || '');
+  const [profilePreview, setProfilePreview] = useState(userData?.profileImage || '');
+  const dispatch = useDispatch();
   const initialValues = {
-    name: userData?.name || '',
+    name: userData?.fullName || '',
     bio: userData?.bio || '',
     location: userData?.location || '',
     coverImage: userData?.coverImage || '',
@@ -42,6 +50,14 @@ const ProfileModal = ({ open, handleClose, userData }) => {
     try {
       console.log('Form values:', values);
       // Add your API call here to update profile
+      if(values.coverImage){
+        values.coverImage = await uploadToCloudnary(values.coverImage);
+      }
+      if(values.profileImage){
+        values.profileImage = await uploadToCloudnary(values.profileImage);
+      }
+      dispatch(updateUserProfile(values));
+
       handleClose();
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -86,49 +102,63 @@ const ProfileModal = ({ open, handleClose, userData }) => {
                 {/* Cover Image */}
                 <div className="mb-6">
                   <div className="h-48 bg-gray-200 rounded-lg relative">
-                    {initialValues.coverImage && (
+                    {coverPreview && (
                       <img
-                        src={initialValues.coverImage}
+                        src={coverPreview}
                         alt="Cover"
                         className="w-full h-full object-cover rounded-lg"
                       />
                     )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          setFieldValue('coverImage', URL.createObjectURL(file));
-                        }
-                      }}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <label className="cursor-pointer bg-black/50 p-2 rounded-full hover:bg-black/70 transition">
+                        <AddPhotoAlternateIcon className="text-white" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              const imageUrl = URL.createObjectURL(file);
+                              setCoverPreview(imageUrl);
+                              setFieldValue('coverImage', file);
+                            }
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
 
                 {/* Profile Image */}
                 <div className="mb-6 relative">
                   <div className="absolute -top-16 left-4">
-                    <div className="w-32 h-32 rounded-full bg-gray-300 relative">
-                      {initialValues.profileImage && (
+                    <div className="w-32 h-32 rounded-full bg-gray-300 relative overflow-hidden">
+                      {profilePreview && (
                         <img
-                          src={initialValues.profileImage}
+                          src={profilePreview}
                           alt="Profile"
                           className="w-full h-full rounded-full object-cover"
                         />
                       )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            setFieldValue('profileImage', URL.createObjectURL(file));
-                          }
-                        }}
-                        className="absolute inset-0 opacity-0 cursor-pointer rounded-full"
-                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition">
+                        <label className="cursor-pointer">
+                          <AddPhotoAlternateIcon className="text-white" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const imageUrl = URL.createObjectURL(file);
+                                setProfilePreview(imageUrl);
+                                setFieldValue('profileImage', file);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>

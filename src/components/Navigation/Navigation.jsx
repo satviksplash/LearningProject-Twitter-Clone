@@ -52,7 +52,7 @@ const Navigation = () => {
   <div className="flex items-center gap-2 px-3 py-2 hover:bg-gray-200 rounded-full cursor-pointer">
     <Avatar 
       alt={auth.user?.fullName || "Profile"} 
-      src="https://t4.ftcdn.net/jpg/02/66/72/41/360_F_266724172_Iy8gdKgMa7XmrhYYxLCxyhx6J7070Pr8.jpg"
+      src={auth.user?.profileImage  || "https://t4.ftcdn.net/jpg/02/66/72/41/360_F_266724172_Iy8gdKgMa7XmrhYYxLCxyhx6J7070Pr8.jpg"}
     />
     <div className="flex flex-col">
       <span className="font-bold text-sm">

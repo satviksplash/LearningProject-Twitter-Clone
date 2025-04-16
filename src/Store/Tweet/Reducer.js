@@ -47,10 +47,10 @@ export const tweetReducer = (state = initialState, action) => {
     case LIKE_TWEET_REQUEST:
     case RETWEET_REQUEST:
     case FIND_TWEET_BY_ID_REQUEST:
-      // case GET_ALL_TWEETS_REQUEST:
-      // case GET_USER_TWEETS_REQUEST:
+      case GET_ALL_TWEETS_REQUEST:
+      case GET_USER_TWEETS_REQUEST:
 
-      // case REPLY_TWEET_REQUEST:
+      case REPLY_TWEET_REQUEST:
 
       return {
         ...state,
@@ -59,12 +59,15 @@ export const tweetReducer = (state = initialState, action) => {
       };
 
     // All failure cases
-    case TWEET_CREATE_REQUEST:
-    case TWEET_DELETE_REQUEST:
-    case USER_LIKE_TWEET_REQUEST:
-    case LIKE_TWEET_REQUEST:
-    case RETWEET_REQUEST:
-    case FIND_TWEET_BY_ID_REQUEST:
+    case TWEET_CREATE_FAILURE:
+    case TWEET_DELETE_FAILURE:
+    case USER_LIKE_TWEET_FAILURE:
+    case LIKE_TWEET_FAILURE:
+    case RETWEET_FAILURE:
+    case FIND_TWEET_BY_ID_FAILURE:
+    case GET_ALL_TWEETS_FAILURE:
+    case GET_USER_TWEETS_FAILURE:
+    case REPLY_TWEET_FAILURE:
       return {
         ...state,
         loading: false,
@@ -73,6 +76,7 @@ export const tweetReducer = (state = initialState, action) => {
 
     // Tweet creation
     case TWEET_CREATE_SUCCESS:
+    case REPLY_TWEET_SUCCESS:
       return {
         ...state,
         loading: false,
@@ -97,11 +101,17 @@ export const tweetReducer = (state = initialState, action) => {
 
     // Get all tweets
     case GET_ALL_TWEETS_SUCCESS:
-    case GET_USER_TWEETS_SUCCESS:
       return {
         ...state,
         loading: false,
         tweets: action.payload,
+        error: null,
+      };
+    case GET_USER_TWEETS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        userTweets: action.payload,
         error: null,
       };
 
@@ -125,7 +135,7 @@ export const tweetReducer = (state = initialState, action) => {
 
     // Find tweet by ID
     case FIND_TWEET_BY_ID_SUCCESS:
-    case REPLY_TWEET_SUCCESS:
+    // case REPLY_TWEET_SUCCESS:
       return {
         ...state,
         loading: false,

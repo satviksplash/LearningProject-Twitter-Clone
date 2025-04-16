@@ -7,7 +7,7 @@ import uploadToCloudnary from "../../Utils/uploadToCloudnary";
 
 const HomeSection = () => {
   const dispatch = useDispatch();
-  const {tweet} =  useSelector((state) => state);
+  const tweet =  useSelector((state) => state.tweet);
   // console.log(tweet);
   // const [tweets, setTweets] = useState([]);
   const [tweetText, setTweetText] = useState("");
@@ -55,7 +55,7 @@ const HomeSection = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-screen border-x border-gray-300">
+    <div className="flex flex-col w-full min-h-screen border-x border-gray-300">
       {/* Header */}
       <div className="sticky top-0 bg-white z-10 p-4 border-b border-gray-300">
         <h1 className="text-xl font-bold">Home</h1>

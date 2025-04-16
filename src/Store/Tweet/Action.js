@@ -36,7 +36,7 @@ export const getAllTweets = () => async (dispatch) => {
 export const getUserTweets = (userId) => async (dispatch) => {
   try {
     const { data } = await getApi().get(`/api/tweets/user/${userId}`);
-    console.log("get user tweets", data);
+    console.log(`get user tweets userId : ${userId}`, data);
 
     dispatch({ type: GET_USER_TWEETS_SUCCESS, payload: data });
   } catch (err) {
@@ -103,7 +103,7 @@ export const createTweetReply = (tweetData) => async (dispatch) => {
 
 export const createReTweet = (tweetId) => async (dispatch) => {
   try {
-    const { data } = await api.put(`/api/tweets/${tweetId}/retweet`);
+    const { data } = await getApi().put(`/api/tweets/${tweetId}/retweet`);
     console.log("created retweet : ", data);
 
     dispatch({ type: RETWEET_SUCCESS, payload: data });

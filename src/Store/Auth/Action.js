@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 
 import axios from "axios";
-import { api, API_BASE_URL } from "../../config/api";
+import { api, API_BASE_URL, getApi } from "../../config/api";
 import {
   FIND_USER_BY_ID_FAILURE,
   FIND_USER_BY_ID_SUCCESS,
@@ -14,6 +14,8 @@ import {
   LOGOUT,
   REGISTER_USER_FAILURE,
   REGISTER_USER_SUCCESS,
+  UPDATE_USER_FAILURE,
+  UPDATE_USER_SUCCESS,
 } from "./ActionType";
 
 export const loginUser = (loginData) => async (dispatch) => {
@@ -81,11 +83,11 @@ export const logout = () => async (dispatch) => {
 
 export const findUserById = (userId) => async (dispatch) => {
   try {
-    const { data } = await api.get(`/api/user/${userId}`);
+    const { data } = await getApi().get(`/api/user/${userId}`);
     
     dispatch({ type: FIND_USER_BY_ID_SUCCESS, payload: data });
   } catch (error) {
-    console.error("Error register : ", error);
+    console.error("Error finding user by ID: ", error);
     dispatch({ type: FIND_USER_BY_ID_FAILURE, payload: error.message });
   }
 };
@@ -93,22 +95,22 @@ export const findUserById = (userId) => async (dispatch) => {
 
 export const updateUserProfile = (reqData) => async (dispatch) => {
   try {
-    const { data } = await api.put(`/api/user/update`);
+    const { data } = await getApi().put(`/api/user/update`, reqData);
     console.log("updated User " , data);
-    dispatch({ type: FIND_USER_BY_ID_SUCCESS, payload: data });
+    dispatch({ type: UPDATE_USER_SUCCESS, payload: data });
   } catch (error) {
-    console.error("Error register : ", error);
-    dispatch({ type: FIND_USER_BY_ID_FAILURE, payload: error.message });
+    console.error("Error updating user profile: ", error);
+    dispatch({ type: UPDATE_USER_FAILURE, payload: error.message });
   }
 };
 
 export const followUserAction = (userId) => async (dispatch) => {
   try {
-    const { data } = await api.put(`/api/user/${userId}/follow`);
+    const { data } = await getApi().put(`/api/user/${userId}/follow`);
     console.log("followed User " , data);
     dispatch({ type: FOLLOW_USER_SUCCESS, payload: data });
   } catch (error) {
-    console.error("Error register : ", error);
+    console.error("Error following user: ", error);
     dispatch({ type: FOLLOW_USER_FAILURE, payload: error.message });
   }
 };

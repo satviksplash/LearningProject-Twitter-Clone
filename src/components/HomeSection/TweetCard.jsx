@@ -82,7 +82,7 @@ const TweetCard = ({item}) => {
           onClick={() => navigate(`/profile/${item?.user?.id}`)}
           className="cursor-pointer"
           alt="John Doe"
-          src="https://res.cloudinary.com/demo/image/upload/kitten.jpg"
+          src={item?.user?.profileImage || "https://res.cloudinary.com/demo/image/upload/kitten.jpg"}
         />
 
         {/* Tweet Details */}
