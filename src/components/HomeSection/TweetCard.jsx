@@ -8,7 +8,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ReplyModal from "./ReplyModal";
 import { useDispatch, useSelector } from "react-redux";
-import { createReTweet, deleteTweet, likeTweet } from "../../Store/Tweet/Action";
+import { createReTweet, deleteTweet, findTweetById, likeTweet } from "../../Store/Tweet/Action";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -37,17 +37,22 @@ const formatDate = (dateString) => {
   }
 };
 
-const TweetCard = ({item}) => {
+const TweetCard = ({item, isReply = false}) => {
 
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false); // State to toggle the menu
+
+  const [showAfterDelete, setShowAfterDelete] = useState(false);
 
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
 
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
 
+  
+
   // console.log(" auth : ",auth);
+  const [liked, setLiked] = useState(item?.liked);
 
   const loggedInUserId = auth?.user?.id; // Hardcoded logged-in user ID - replace with actual auth
   const tweetUserId = item?.user?.id; // Hardcoded tweet user ID - replace with actual data
@@ -56,6 +61,9 @@ const TweetCard = ({item}) => {
   const handleDelete = () => {
     dispatch(deleteTweet(item.id));
     console.log("Tweet deleted");
+    if(isReply){
+      setShowAfterDelete(true);
+    }
     setShowMenu(false); // Close the menu after deletion
     // Add your delete logic here
   };
@@ -71,7 +79,7 @@ const TweetCard = ({item}) => {
   }
 
   const handleLikeToggle = () => {
-    // setLiked(!liked); // Toggle like/unlike state
+    setLiked(!liked); // Toggle like/unlike state
     // Add your like/unlike logic here
     dispatch(likeTweet(item.id));
     console.log("Tweet liked/unliked");
@@ -79,11 +87,12 @@ const TweetCard = ({item}) => {
   };
 
   return (
-    <div className="p-4 border-b border-gray-300 hover:bg-gray-100">
+    <>
+    {showAfterDelete==false &&<div className="p-4 border-b border-gray-300 hover:bg-gray-100">
       {/* Retweet Info */}
       {item?.retweet && <div className="flex items-center text-sm text-gray-500 mb-2">
         <RepeatIcon fontSize="small" />
-        <p className="ml-1">{item?.user?.fullName} retweeted</p>
+        <p className="ml-1"> retweeted</p>
       </div>}
 
       {/* Main Tweet Content */}
@@ -169,7 +178,7 @@ const TweetCard = ({item}) => {
               className="flex items-center space-x-1 cursor-pointer hover:text-red-500"
               onClick={handleLikeToggle}
             >
-              {item?.liked ? (
+              {(item?.liked) ? (
                 <FavoriteIcon fontSize="small" className="text-red-500" />
               ) : (
                 <FavoriteBorderIcon fontSize="small" />
@@ -185,7 +194,8 @@ const TweetCard = ({item}) => {
   handleClose={() => setIsReplyModalOpen(false)}
   item={item}
 />
-    </div>
+    </div>}
+    </>
   );
 };
 

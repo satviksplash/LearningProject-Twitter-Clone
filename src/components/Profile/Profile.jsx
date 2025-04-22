@@ -21,16 +21,13 @@ const Profile = () => {
   const tweet = useSelector((state) => state.tweet);
   const { id } = useParams();
 
-  // console.log("tweet",tweet);
-  
-  // Get the current logged-in user
-  // console.log("auth",auth);
+
   const currentUser = auth.user;
   // console.log("currentUser",currentUser);
 
   const profileUser = auth.findUser;
   // console.log("profileUser",profileUser);
-  // Check if the profile is of the current user
+
   const isOwnProfile = currentUser?.id === profileUser?.id;
   const user = profileUser;
 
@@ -173,7 +170,7 @@ const Profile = () => {
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200">
-        {["Tweets", "Replies", "Media", "Likes"].map((tab) => (
+        {["Tweets", "Followers", "Followings", "Likes"].map((tab) => (
           <button
             key={tab}
             className={`flex-1 py-4 hover:bg-gray-100 ${
@@ -204,12 +201,68 @@ const Profile = () => {
       )}
 
       {/* Replies Section */}
-      {activeTab === "replies" && <div className="p-4 text-center">
-        
-        </div>}
+      {activeTab === "followers" && (
+        <div className="divide-y divide-gray-200">
+          {user?.followers?.length > 0 ? (
+            user.followers.map((follower) => (
+              <div 
+                key={follower.id} 
+                className="flex items-center p-4 hover:bg-gray-50 cursor-pointer"
+                onClick={() => {
+                  navigate(`/profile/${follower.id}`)
+                  setActiveTab("tweets")
+                }}
+              >
+                <Avatar
+                  src={follower.profileImage || "https://www.orangepet.in/cdn/shop/articles/selective-closeup-cute-kitten-floor_1_800x.jpg?v=1693461218"}
+                  alt={follower.fullName}
+                  sx={{ width: 50, height: 50, mr: 2 }}
+                />
+                <div className="flex-1">
+                  <h3 className="font-bold">{follower.fullName}</h3>
+                  <p className="text-gray-500">@{follower.username || follower.fullName?.split(" ").join("_").toLowerCase()}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-8 text-center text-gray-500">
+              <p>No followers yet</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Media Section */}
-      {activeTab === "media" && <div className="p-4 text-center">Media coming soon</div>}
+      {activeTab === "followings" && (
+        <div className="divide-y divide-gray-200">
+          {user?.following?.length > 0 ? (
+            user.following.map((following) => (
+              <div 
+                key={following.id} 
+                className="flex items-center p-4 hover:bg-gray-50 cursor-pointer"
+                onClick={() => {
+                  navigate(`/profile/${following.id}`)
+                  setActiveTab("tweets")
+                }}
+              >
+                <Avatar
+                  src={following.profileImage || "https://www.orangepet.in/cdn/shop/articles/selective-closeup-cute-kitten-floor_1_800x.jpg?v=1693461218"}
+                  alt={following.fullName}
+                  sx={{ width: 50, height: 50, mr: 2 }}
+                />
+                <div className="flex-1">
+                  <h3 className="font-bold">{following.fullName}</h3>
+                  <p className="text-gray-500">@{following.username || following.fullName?.split(" ").join("_").toLowerCase()}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-8 text-center text-gray-500">
+              <p>Not following anyone yet</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Likes Section */}
       {activeTab === "likes" && (

@@ -59,6 +59,7 @@ export const authReducer = (state = initialState, action) => {
                 loading: false,
                 error: null,
                 user: action.payload,
+                findUser: state.findUser?.id === action.payload.id ? action.payload : state.findUser,
                 updateUser: true
             }
 
@@ -91,6 +92,12 @@ export const authReducer = (state = initialState, action) => {
                 loading: false,
                 error: action.payload
             }
+
+        case 'CLEAR_AUTH_ERROR':
+            return {
+              ...state,
+              error: null
+            };
 
         default:
             return state;

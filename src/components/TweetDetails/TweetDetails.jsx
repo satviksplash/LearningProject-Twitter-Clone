@@ -17,11 +17,7 @@ const TweetDetails = () => {
   }
 
   }, []);
-
-
-
-  // // Hardcoded replies - replace with API call
-  const {tweet} = useSelector((state) => state);
+  const tweet = useSelector((state) => state.tweet);
   const replies = tweet.tweet?.replyTweets;
 
   return (
@@ -49,7 +45,7 @@ const TweetDetails = () => {
         </div>
         <div className="divide-y divide-gray-200">
           {replies && replies.map((_, index) => (
-            <TweetCard item={_} key={index} />
+            <TweetCard item={_} key={index} isReply={true}/>
           ))}
         </div>
         {replies?.length === 0 && (

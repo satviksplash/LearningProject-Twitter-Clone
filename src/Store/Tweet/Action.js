@@ -59,6 +59,7 @@ export const findTweetById = (tweetId) => async (dispatch) => {
 
 export const getUserLikedTweets = (userId) => async (dispatch) => {
   try {
+    console.log("get user liked tweets userId : ", userId);
     const { data } = await getApi().get(`/api/tweets/user/${userId}/likes`);
     console.log("get user liked tweets", data);
 

@@ -76,7 +76,6 @@ export const tweetReducer = (state = initialState, action) => {
 
     // Tweet creation
     case TWEET_CREATE_SUCCESS:
-    case REPLY_TWEET_SUCCESS:
       return {
         ...state,
         loading: false,
@@ -85,19 +84,38 @@ export const tweetReducer = (state = initialState, action) => {
         error: null,
       };
 
+      case REPLY_TWEET_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          tweets: state.tweets.map(tweet => 
+            tweet.id === action.payload.id ? action.payload : tweet
+          ),
+          tweet: state.tweet?.id === action.payload.id ? action.payload : state.tweet,
+          error: null,
+        };
+
     // Tweet deletion
     case TWEET_DELETE_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        tweets: state.tweets.filter(
-          (tweet) => tweet.id !== action.payload
-        ),
-        userTweets: state.userTweets.filter(
-          (tweet) => tweet.id !== action.payload
-        ),
-        error: null,
-      };
+  return {
+    ...state,
+    loading: false,
+    // Remove from tweets array
+    tweets: state.tweets.filter(tweet => tweet.id !== action.payload),
+    // Remove from userTweets
+    userTweets: state.userTweets.filter(tweet => tweet.id !== action.payload),
+    // If we're in tweet details and a reply was deleted
+    tweet: state.tweet ? {
+      ...state.tweet,
+      // Filter out the deleted reply
+      replyTweets: state.tweet.replyTweets?.filter(
+        reply => reply.id !== action.payload
+      ) || [],
+      // Decrease the reply count
+      totalReplies: Math.max(0, (state.tweet.totalReplies || 1) - 1)
+    } : state.tweet,
+    error: null,
+  };
 
     // Get all tweets
     case GET_ALL_TWEETS_SUCCESS:
@@ -126,12 +144,37 @@ export const tweetReducer = (state = initialState, action) => {
 
     // Like/Unlike tweet
     case LIKE_TWEET_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        like:action.payload,
-        error: null,
-      };
+  return {
+    ...state,
+    loading: false,
+    like: action.payload,
+    // Update in tweets array
+    tweets: state.tweets.map(tweet => 
+      tweet.id === action.payload.tweet.id ? {
+        ...tweet,
+        liked: !tweet.liked,
+        totalLikes: tweet.liked ? tweet.totalLikes - 1 : tweet.totalLikes + 1
+      } : tweet
+    ),
+    // Update in tweet details (both parent and replies)
+    tweet: state.tweet ? {
+      ...state.tweet,
+      // If the liked tweet is the parent tweet
+      ...(state.tweet.id === action.payload.tweet.id ? {
+        liked: !state.tweet.liked,
+        totalLikes: state.tweet.liked ? state.tweet.totalLikes - 1 : state.tweet.totalLikes + 1
+      } : {}),
+      // If the liked tweet is a reply, update it in replyTweets
+      replyTweets: state.tweet.replyTweets?.map(reply =>
+        reply.id === action.payload.tweet.id ? {
+          ...reply,
+          liked: !reply.liked,
+          totalLikes: reply.liked ? reply.totalLikes - 1 : reply.totalLikes + 1
+        } : reply
+      ) || []
+    } : state.tweet,
+    error: null,
+  };
 
     // Find tweet by ID
     case FIND_TWEET_BY_ID_SUCCESS:

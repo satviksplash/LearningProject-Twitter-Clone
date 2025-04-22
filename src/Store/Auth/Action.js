@@ -49,8 +49,11 @@ export const registerUser = (reisterData) => async (dispatch) => {
 
     dispatch({ type: REGISTER_USER_SUCCESS, payload: data.jwt });
   } catch (error) {
-    console.error("Error register : ", error);
-    dispatch({ type: REGISTER_USER_FAILURE, payload: error.message });
+    const errorMessage = error.response?.data?.message || "Registration failed";
+    dispatch({ type: REGISTER_USER_FAILURE, payload: {
+      message: errorMessage,
+      field: 'email' // Since we know this error is for email
+    }});
   }
 };
 
@@ -63,7 +66,7 @@ export const getUserProfile = (jwt) => async (dispatch) => {
     });
     dispatch({ type: GET_USER_PROILE_SUCCESS, payload: data });
   } catch (error) {
-    console.error("Error register : ", error);
+    console.error("get user profile error : ", error);
     dispatch({ type: GET_USER_PROILE_FAILURE, payload: error.message });
   }
 };

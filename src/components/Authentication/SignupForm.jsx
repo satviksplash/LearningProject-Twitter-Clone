@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { DialogTitle, DialogContent, TextField, Button, IconButton, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../Store/Auth/Action';
 
 // Validation schema
@@ -40,7 +40,7 @@ password: Yup.string()
 
 const SignupForm = ({ onClose }) => {
     const dispatch = useDispatch();
-
+    const auth = useSelector((state) => state.auth);
   const initialValues = {
     name: '',
     email: '',
@@ -95,7 +95,7 @@ const SignupForm = ({ onClose }) => {
           validationSchema={SignupSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting, errors, touched }) => (
+          {({ isSubmitting, errors, touched, handleChange }) => (
             <Form>
               <div className="mb-4">
                 <Field
@@ -110,16 +110,25 @@ const SignupForm = ({ onClose }) => {
               </div>
               
               <div className="mb-4">
-                <Field
-                  as={TextField}
-                  name="email"
-                  label="Phone or email" 
-                  variant="outlined" 
-                  fullWidth
-                  error={touched.email && Boolean(errors.email)}
-                  helperText={touched.email && errors.email}
-                />
-              </div>
+        <Field
+          as={TextField}
+          name="email"
+          label="Phone or email" 
+          variant="outlined" 
+          fullWidth
+          onChange={(e) => {
+            handleChange(e);  // Handle Formik's change
+            if (auth.error?.field === 'email') {  // If there was a backend error
+              dispatch({ type: 'CLEAR_AUTH_ERROR' });  // Clear it
+            }
+          }}
+          error={(touched.email && Boolean(errors.email)) || (auth.error?.field === 'email' && auth.error.message)}
+          helperText={
+            (touched.email && errors.email) || 
+            (auth.error?.field === 'email' && auth.error.message)
+          }
+        />
+      </div>
 
               {/* Add password field before date of birth */}
               <div className="mb-4">
