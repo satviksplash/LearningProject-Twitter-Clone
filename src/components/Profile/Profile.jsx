@@ -83,88 +83,109 @@ const Profile = () => {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md">
-        <div className="flex items-center gap-3 px-4 py-2">
-          <ArrowBackIcon
-            className="cursor-pointer"
-            onClick={() => navigate(-1)}
-          />
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <div className="hover:bg-gray-200 p-2 rounded-full cursor-pointer transition-colors">
+            <ArrowBackIcon
+              className="text-gray-700"
+              onClick={() => navigate(-1)}
+            />
+          </div>
           <div>
-            <h2 className="font-bold text-xl">{user?.fullName || "Loading..."}</h2>
-            {/* <p className="text-sm text-gray-500">{tweet.userTweets?.length || 0} tweets</p> */}
+            <h2 className="font-bold text-xl leading-6">{user?.fullName || "Loading..."}</h2>
+            <p className="text-sm text-gray-500">{tweet.userTweets?.length || 0} tweets</p>
           </div>
         </div>
       </div>
 
-      {/* Cover Image */}
-      <div className="h-48 bg-gray-200">
-        <img
-          src={user?.coverImage || "https://www.orangepet.in/cdn/shop/articles/selective-closeup-cute-kitten-floor_1_800x.jpg?v=1693461218"}
-          alt="cover"
-          className="w-full h-full object-cover"
-        />
-      </div>
-
       {/* Profile Section */}
-      <div className="px-4 pb-4 border-b border-gray-200">
-        {/* Avatar and Edit Button */}
-        <div className="relative -mt-16 mb-3 flex justify-between items-start">
-          <Avatar
-            src={user?.profileImage || "https://www.orangepet.in/cdn/shop/articles/selective-closeup-cute-kitten-floor_1_800x.jpg?v=1693461218"}
-            alt={user?.fullName || "User"}
-            sx={{ width: 120, height: 120, border: "4px solid white" }}
+      <div className="relative px-4 pb-4 border-b border-gray-200">
+        {/* Cover Image with overlay */}
+        <div className="h-48 bg-gray-200 relative">
+          <img
+            src={user?.coverImage || "https://www.orangepet.in/cdn/shop/articles/selective-closeup-cute-kitten-floor_1_800x.jpg?v=1693461218"}
+            alt="cover"
+            className="w-full h-full object-cover"
           />
+          <div className="absolute inset-0 bg-black opacity-10"></div>
+        </div>
+
+        {/* Avatar and Edit/Follow Button */}
+        <div className="relative -mt-16 mb-3 flex justify-between items-start px-4">
+          {/* Avatar with white border */}
+          <div className="ring-4 ring-white rounded-full shadow-md">
+            <Avatar
+              src={user?.profileImage || "https://www.orangepet.in/cdn/shop/articles/selective-closeup-cute-kitten-floor_1_800x.jpg?v=1693461218"}
+              alt={user?.fullName || "User"}
+              sx={{ width: 120, height: 120 }}
+            />
+          </div>
+
           {isOwnProfile ? (
-            // Show Edit Profile button for logged-in user
-            <button onClick={() => setIsModalOpen(true)} className="px-4 py-1.5 border border-gray-300 rounded-full font-semibold hover:bg-gray-100">
+            // Edit Profile button with better visibility
+            <button 
+              onClick={() => setIsModalOpen(true)} 
+              className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-bold text-gray-800 
+                         hover:bg-gray-100 transition-colors duration-200 shadow-md
+                         active:scale-95 transform"
+            >
               Edit Profile
             </button>
           ) : (
-            // Show Follow/Unfollow button for other profiles
+            // Follow/Unfollow button with enhanced styling
             <button
               onClick={handleFollowToggle}
-              className={`px-4 py-1.5 rounded-full font-semibold ${
-                isFollowing
-                  ? "border border-gray-300 hover:border-red-300 hover:text-red-600 hover:bg-red-50"
-                  : "bg-black text-white hover:bg-gray-800"
-              }`}
+              className={`px-5 py-2 rounded-full font-bold transition-all duration-200 
+                         shadow-md active:scale-95 transform
+                         ${isFollowing 
+                           ? "bg-white border-2 border-gray-300 text-gray-800 hover:border-red-500 hover:text-red-600 hover:bg-red-50" 
+                           : "bg-black text-white border-2 border-transparent hover:bg-gray-800"}`}
             >
-              {isFollowing ? "Following" : "Follow"}
+              {isFollowing ? (
+                <span className="flex items-center gap-1">
+                  <span className="group-hover:hidden">Following</span>
+                  <span className="hidden group-hover:inline text-red-600">Unfollow</span>
+                </span>
+              ) : (
+                "Follow"
+              )}
             </button>
           )}
         </div>
 
         {/* User Info */}
-        <div className="mb-4">
-          <h2 className="font-bold text-xl">{user?.fullName || "Loading..."}</h2>
-          <p className="text-gray-500">@{user?.username || user?.fullName?.split(" ").join("_").toLowerCase()}</p>
-        </div>
-
-        {/* Bio */}
-        <p className="mb-4">{user?.bio || "No bio available"}</p>
-
-        {/* Location and Join Date */}
-        <div className="flex gap-4 text-gray-500 mb-4">
-          <div className="flex items-center gap-1">
-            <LocationOnIcon fontSize="small" />
-            <span>{user?.location || "No location"}</span>
+        <div className="space-y-3">
+          <div>
+            <h2 className="font-bold text-xl leading-6">{user?.fullName || "Loading..."}</h2>
+            <p className="text-gray-500 text-sm">@{user?.username || user?.fullName?.split(" ").join("_").toLowerCase()}</p>
           </div>
-          <div className="flex items-center gap-1">
-            <CalendarMonthIcon fontSize="small" />
-            <span>{user?.createdAt || "Joined recently"}</span>
-          </div>
-        </div>
 
-        {/* Following/Followers */}
-        <div className="flex gap-4">
-          <button className="hover:underline">
-            <span className="font-bold">{user?.following?.length || 0}</span>{" "}
-            <span className="text-gray-500">Following</span>
-          </button>
-          <button className="hover:underline">
-            <span className="font-bold">{user?.followers?.length || 0}</span>{" "}
-            <span className="text-gray-500">Followers</span>
-          </button>
+          {/* Bio */}
+          <p className="text-gray-800 whitespace-pre-wrap">{user?.bio || "No bio available"}</p>
+
+          {/* Location and Join Date */}
+          <div className="flex gap-4 text-gray-500 text-sm">
+            <div className="flex items-center gap-1 hover:underline cursor-pointer">
+              <LocationOnIcon fontSize="small" />
+              <span>{user?.location || "No location"}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <CalendarMonthIcon fontSize="small" />
+              <span>{user?.createdAt || "Joined recently"}</span>
+            </div>
+          </div>
+
+          {/* Following/Followers */}
+          <div className="flex gap-4">
+            <button className="hover:underline transition-colors">
+              <span className="font-bold">{user?.following?.length || 0}</span>{" "}
+              <span className="text-gray-500">Following</span>
+            </button>
+            <button className="hover:underline transition-colors">
+              <span className="font-bold">{user?.followers?.length || 0}</span>{" "}
+              <span className="text-gray-500">Followers</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -173,14 +194,17 @@ const Profile = () => {
         {["Tweets", "Followers", "Followings", "Likes"].map((tab) => (
           <button
             key={tab}
-            className={`flex-1 py-4 hover:bg-gray-100 ${
+            className={`flex-1 py-4 hover:bg-gray-100 transition-colors relative ${
               activeTab === tab.toLowerCase()
-                ? "border-b-4 border-blue-500 font-bold"
+                ? "font-bold"
                 : "text-gray-500"
             }`}
             onClick={() => setActiveTab(tab.toLowerCase())}
           >
             {tab}
+            {activeTab === tab.toLowerCase() && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 rounded-full"></div>
+            )}
           </button>
         ))}
       </div>
@@ -207,7 +231,7 @@ const Profile = () => {
             user.followers.map((follower) => (
               <div 
                 key={follower.id} 
-                className="flex items-center p-4 hover:bg-gray-50 cursor-pointer"
+                className="flex items-center p-4 hover:bg-gray-50 cursor-pointer transition-colors"
                 onClick={() => {
                   navigate(`/profile/${follower.id}`)
                   setActiveTab("tweets")
@@ -217,10 +241,11 @@ const Profile = () => {
                   src={follower.profileImage || "https://www.orangepet.in/cdn/shop/articles/selective-closeup-cute-kitten-floor_1_800x.jpg?v=1693461218"}
                   alt={follower.fullName}
                   sx={{ width: 50, height: 50, mr: 2 }}
+                  className="ring-2 ring-gray-200"
                 />
                 <div className="flex-1">
-                  <h3 className="font-bold">{follower.fullName}</h3>
-                  <p className="text-gray-500">@{follower.username || follower.fullName?.split(" ").join("_").toLowerCase()}</p>
+                  <h3 className="font-bold hover:underline">{follower.fullName}</h3>
+                  <p className="text-gray-500 text-sm">@{follower.username || follower.fullName?.split(" ").join("_").toLowerCase()}</p>
                 </div>
               </div>
             ))
