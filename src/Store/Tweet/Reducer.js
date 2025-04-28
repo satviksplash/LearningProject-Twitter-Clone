@@ -26,6 +26,8 @@ import {
   RETWEET_REQUEST,
   RETWEET_SUCCESS,
   RETWEET_FAILURE,
+  GET_ALL_TWEETS_WITH_PAGINATION_FAILURE,
+  GET_ALL_TWEETS_WITH_PAGINATION_SUCCESS,
 } from "./ActionType";
 
 const initialState = {
@@ -68,6 +70,7 @@ export const tweetReducer = (state = initialState, action) => {
     case GET_ALL_TWEETS_FAILURE:
     case GET_USER_TWEETS_FAILURE:
     case REPLY_TWEET_FAILURE:
+    case GET_ALL_TWEETS_WITH_PAGINATION_FAILURE:
       return {
         ...state,
         loading: false,
@@ -197,6 +200,15 @@ export const tweetReducer = (state = initialState, action) => {
         loading: false,
         tweets: [action.payload, ...state.tweets],
         userTweets: [action.payload, ...state.userTweets],
+        error: null,
+      };
+
+    case GET_ALL_TWEETS_WITH_PAGINATION_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        tweets: action.payload.content,
+        pagedTweets: action.payload,
         error: null,
       };
 

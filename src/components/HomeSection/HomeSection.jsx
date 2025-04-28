@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ImageIcon from "@mui/icons-material/Image";
 import TweetCard from "./TweetCard";
 import { useDispatch, useSelector } from "react-redux";
-import { createTweet, getAllTweets } from "../../Store/Tweet/Action";
+import { createTweet, getAllTweets, getAllTweetsWithPagination } from "../../Store/Tweet/Action";
 import uploadToCloudnary from "../../Utils/uploadToCloudnary";
 
 const HomeSection = () => {
@@ -15,6 +15,11 @@ const HomeSection = () => {
 
   const [tweetImage, setTweetImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+
+  const [page, setPage] = useState(0);
+
+  const  totalPages = tweet.pagedTweets?.totalPages;
+  const  totalElements = tweet.pagedTweets?.totalElements;
 
   const handleTweetChange = (e) => {
     const text = e.target.value;
@@ -34,8 +39,8 @@ const HomeSection = () => {
 
   useEffect(()=>{
     // console.log("in useEffect")
-    dispatch(getAllTweets());
-  }, [dispatch,  tweet.like])
+    dispatch(getAllTweetsWithPagination(page));
+  }, [dispatch, page,  tweet.like])
 
 
   const handleTweetSubmit =  async () => {
@@ -51,6 +56,9 @@ const HomeSection = () => {
       setTweetImage(null);
       setImagePreview(null); // Clear preview
       setIsTyping(false);
+
+      setPage(0);
+      dispatch(getAllTweetsWithPagination(0));
     }
   };
 
@@ -117,15 +125,70 @@ const HomeSection = () => {
       </div>
 
       {/* Tweets Feed */}
-      <div className="flex flex-col mx-5 my-5">
-        {tweet.tweets.map((item, index) => (
-          <TweetCard item={item}  key={index}/>
-        ))}
+<div className="flex flex-col mx-5 my-5">
+  {tweet.tweets.map((item, index) => (
+    <TweetCard item={item} key={index}/>
+  ))}
 
-        <div className="p-4 text-gray-500 text-center">
-          No tweets yet. Start tweeting!
-        </div>
+  {tweet.tweets.length === 0 && (
+    <div className="p-4 text-gray-500 text-center">
+      No tweets yet. Start tweeting!
+    </div>
+  )}
+
+  {/* Pagination Bar */}
+  {totalPages > 1 && (
+    <div className="flex items-center justify-center gap-2 mt-4 py-4">
+      {/* Previous Page Button */}
+      <button 
+        onClick={() => setPage(prev => Math.max(0, prev - 1))}
+        disabled={page === 0}
+        className={`px-3 py-1 rounded-full border ${
+          page === 0 
+            ? 'text-gray-400 border-gray-200 cursor-not-allowed' 
+            : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+        }`}
+      >
+        ←
+      </button>
+
+      {/* Page Numbers */}
+      <div className="flex gap-1">
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setPage(index)}
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+              page === index
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
       </div>
+
+      {/* Next Page Button */}
+      <button 
+        onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
+        disabled={page === totalPages - 1}
+        className={`px-3 py-1 rounded-full border ${
+          page === totalPages - 1
+            ? 'text-gray-400 border-gray-200 cursor-not-allowed' 
+            : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+        }`}
+      >
+        →
+      </button>
+
+      {/* Total tweets info */}
+      <span className="text-sm text-gray-500 ml-4">
+        {totalElements} tweets
+      </span>
+    </div>
+  )}
+</div>
     </div>
   );
 };

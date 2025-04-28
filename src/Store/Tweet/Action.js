@@ -5,6 +5,8 @@ import {
   GET_ALL_TWEETS_FAILURE,
   GET_ALL_TWEETS_REQUEST,
   GET_ALL_TWEETS_SUCCESS,
+  GET_ALL_TWEETS_WITH_PAGINATION_FAILURE,
+  GET_ALL_TWEETS_WITH_PAGINATION_SUCCESS,
   GET_USER_TWEETS_FAILURE,
   GET_USER_TWEETS_SUCCESS,
   LIKE_TWEET_FAILURE,
@@ -32,6 +34,20 @@ export const getAllTweets = () => async (dispatch) => {
     dispatch({ type: GET_ALL_TWEETS_FAILURE, payload: err.message });
   }
 };
+
+export const getAllTweetsWithPagination = (page) => async (dispatch) => {
+  try {
+    const { data } = await getApi().get(`/api/tweets/paginated?page=${page}`);
+    console.log("get all tweets with pagination", data);  
+
+    dispatch({ type: GET_ALL_TWEETS_WITH_PAGINATION_SUCCESS, payload: data });
+  } catch (err) {
+    console.log("catch error  -> ", err);
+    dispatch({ type: GET_ALL_TWEETS_WITH_PAGINATION_FAILURE, payload: err.message });
+  }
+};
+
+
 
 export const getUserTweets = (userId) => async (dispatch) => {
   try {
